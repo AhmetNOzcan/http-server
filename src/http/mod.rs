@@ -1,5 +1,8 @@
 pub use method::Method;
 pub use request::ParseError;
 pub use request::Request;
-mod method;
-mod request;
+
+pub mod method;
+pub mod request;
+pub mod query_string;
+
