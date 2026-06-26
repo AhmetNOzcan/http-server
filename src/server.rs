@@ -1,4 +1,4 @@
-use crate::http::Request;
+use crate::http::{Request, request};
 use std::convert::TryFrom;
 use std::{io::Read, net::TcpListener};
 pub struct Server {
@@ -23,7 +23,9 @@ impl Server {
                             let request = String::from_utf8_lossy(&buffer);
                             println!("Request: {}", request);
                             match Request::try_from(&buffer[..]) {
-                                Ok(_) => {}
+                                Ok(request) => {
+                                    dbg!(request);
+                                }
                                 Err(_) => {}
                             }
                         }

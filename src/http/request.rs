@@ -1,10 +1,12 @@
 use super::method::Method;
+use crate::http::QueryString;
 use std::convert::TryFrom;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
+#[derive(Debug)]
 pub struct Request<'buf> {
-    path:  &'buf str,
-    query_string: Option<&'buf str>,
+    path: &'buf str,
+    query_string: Option<QueryString<'buf>>,
     method: Method,
 }
 
@@ -20,11 +22,13 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
             return Err(ParseError::InvalidProtocol);
         }
 
-        let method = method.parse::<Method>().or(Err(ParseError::InvalidMethod))?;
+        let method = method
+            .parse::<Method>()
+            .or(Err(ParseError::InvalidMethod))?;
 
         let mut query_string = None;
         if let Some(i) = path.find('?') {
-            query_string = Some(&path[i + 1..]);
+            query_string = Some(QueryString::from(&path[i + 1..]));
             path = &path[..i];
         }
 
@@ -39,7 +43,7 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
 fn next_world(request: &str) -> Option<(&str, &str)> {
     for (i, c) in request.chars().enumerate() {
         if c == ' ' || c == '\r' {
-            return Some((&request[..i], &request[i+1..]));
+            return Some((&request[..i], &request[i + 1..]));
         }
     }
     None
