@@ -1,12 +1,14 @@
-use crate::http::{Request, Response, StatusCode, request, response};
+use crate::http::{Request, Response, StatusCode, request};
 use std::convert::TryFrom;
-use std::{io::Read, io::Write, net::TcpListener};
+use std::{io::Read, net::TcpListener};
 
 pub trait Handler {
     fn handle_request(&mut self, request: &Request) -> Response;
 
-    fn handle_bad_request(&mut self, e: &request::ParseError) -> Response;
-        
+    fn handle_bad_request(&mut self, e: &request::ParseError) -> Response {
+        println!("Failed to parse request: {}", e);
+        Response::new(StatusCode::BadRequest, None)
+    }
 }
 pub struct Server {
     addr: String,
